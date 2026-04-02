@@ -1,0 +1,27 @@
+# GitHub自动执行配置：每天早上8点自动跑咖啡液品类分析
+name: 咖啡液品类自动分析
+on:
+  schedule:
+    - cron: "0 0 * * *"  # 每天UTC0点=北京时间8点自动执行
+  workflow_dispatch:    # 支持手动一键运行
+
+jobs:
+  run-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+        
+      - name: 安装依赖
+        run: pip install requests litellm
+        
+      - name: 执行AI分析
+        env:
+          DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+        run: python main.py
+        
+      - name: 上传分析报告
+        uses: actions/upload-artifact@v4
+        with:
+          name: 咖啡液品类分析报告
+          path: 咖啡液品类分析报告.md
